@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UK Study Abroad — AI Mock Interview Coach</title>
+  <meta name="description" content="Free AI-powered mock interview practice for UK university, visa, and scholarship interviews. Built for students who can't afford paid platforms." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <i class="ti ti-certificate" aria-hidden="true"></i>
+        <span>Prince AI Portal</span>
+      </div>
+      <div class="nav-tag">For Students</div>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- HOME SCREEN -->
+    <section id="screen-home" class="screen active">
+      <div class="hero">
+        <div class="hero-badge">
+          <i class="ti ti-sparkles" aria-hidden="true"></i>
+          Powered by Jitesh Shrestha· 100% Free
+        </div>
+        <h1 class="hero-title">Ace your UK study abroad interview</h1>
+        <p class="hero-sub">Practice real university, visa, and scholarship interviews with an AI coach that scores your answers and gives you actionable feedback — no signup, no cost.</p>
+      </div>
+
+      <div class="section-label">Choose your interview type</div>
+      <div class="type-grid" id="type-grid">
+        <button class="type-card" data-type="university" onclick="selectType(this)">
+          <div class="type-icon"><i class="ti ti-school" aria-hidden="true"></i></div>
+          <div class="type-body">
+            <h3>University admission</h3>
+            <p>Oxford, UEL, UCB, BNU and more — motivations, subject knowledge, personal statement deep dives</p>
+          </div>
+          <div class="type-check"><i class="ti ti-circle-check-filled" aria-hidden="true"></i></div>
+        </button>
+        <button class="type-card" data-type="visa" onclick="selectType(this)">
+          <div class="type-icon"><i class="ti ti-id-badge" aria-hidden="true"></i></div>
+          <div class="type-body">
+            <h3>UK student visa</h3>
+            <p>CAS letters, financial evidence, study plans, and demonstrating your intent to return home</p>
+          </div>
+          <div class="type-check"><i class="ti ti-circle-check-filled" aria-hidden="true"></i></div>
+        </button>
+        <button class="type-card" data-type="scholarship" onclick="selectType(this)">
+          <div class="type-icon"><i class="ti ti-award" aria-hidden="true"></i></div>
+          <div class="type-body">
+            <h3>Scholarship interview</h3>
+            <p>Chevening, Commonwealth, Gates Cambridge — leadership potential, community impact, career vision</p>
+          </div>
+          <div class="type-check"><i class="ti ti-circle-check-filled" aria-hidden="true"></i></div>
+        </button>
+      </div>
+
+      <div class="home-actions">
+        <button class="btn-primary btn-lg" id="start-btn" onclick="startInterview()" disabled>
+          <i class="ti ti-player-play" aria-hidden="true"></i>
+          Start interview
+        </button>
+        <p class="home-note">5 questions · Instant AI feedback · No account needed</p>
+      </div>
+
+      <div class="how-it-works">
+        <div class="hiw-title">How it works</div>
+        <div class="hiw-grid">
+          <div class="hiw-step">
+            <div class="hiw-num">1</div>
+            <div>
+              <div class="hiw-step-title">Pick your interview type</div>
+              <div class="hiw-step-desc">University, visa, or scholarship — questions tailored to each</div>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">2</div>
+            <div>
+              <div class="hiw-step-title">Answer by voice or text</div>
+              <div class="hiw-step-desc">Speak your answer or type it — just like the real interview</div>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">3</div>
+            <div>
+              <div class="hiw-step-title">Get instant AI coaching</div>
+              <div class="hiw-step-desc">Score out of 10, strengths, improvements, and ideal answer structure</div>
+            </div>
+          </div>
+          <div class="hiw-step">
+            <div class="hiw-num">4</div>
+            <div>
+              <div class="hiw-step-title">Review your report</div>
+              <div class="hiw-step-desc">Full session summary so you know exactly what to work on</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERVIEW SCREEN -->
+    <section id="screen-interview" class="screen">
+      <div class="interview-header">
+        <div class="coach-row">
+          <div class="coach-avatar"><i class="ti ti-robot" aria-hidden="true"></i></div>
+          <div>
+            <div class="coach-name">Er. Prince Shrestha</div>
+            <div class="coach-role">AI Interview Coach · <span id="interview-type-label"></span></div>
+          </div>
+        </div>
+        <button class="btn-ghost btn-sm" onclick="confirmEnd()">
+          <i class="ti ti-x" aria-hidden="true"></i> End session
+        </button>
+      </div>
+
+      <div class="interview-layout">
+        <!-- LEFT: Main panel -->
+        <div class="interview-main">
+          <!-- Question area -->
+          <div id="question-area">
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <div class="loading-text">Preparing your first question...</div>
+            </div>
+          </div>
+
+          <!-- Feedback (shown after submit) -->
+          <div id="feedback-inline" style="display:none;"></div>
+
+          <!-- Answer input -->
+          <div id="answer-area" style="display:none;" class="answer-section">
+            <div class="answer-card">
+              <textarea id="answer-text" placeholder="Type your answer here, or use the microphone button below to speak..." rows="6"></textarea>
+            </div>
+            <div class="answer-actions">
+              <button class="mic-btn" id="mic-btn" onclick="toggleRecording()">
+                <i class="ti ti-microphone" id="mic-icon" aria-hidden="true"></i>
+                <span id="mic-label">Tap to speak</span>
+                <span class="mic-dot" id="mic-dot" style="display:none;"></span>
+              </button>
+              <div class="answer-right-actions">
+                <button class="btn-ghost btn-sm" onclick="skipQuestion()">Skip question</button>
+                <button class="btn-primary" id="submit-btn" onclick="submitAnswer()">
+                  <i class="ti ti-send" aria-hidden="true"></i>
+                  Submit answer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Sidebar -->
+        <aside class="interview-sidebar">
+          <div class="sidebar-card">
+            <div class="sidebar-label">Progress</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+            </div>
+            <div class="q-counter" id="q-counter">Question 1 of 5</div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-label">Answered so far</div>
+            <div id="history-list">
+              <div class="history-empty">No answers yet</div>
+            </div>
+          </div>
+
+          <div class="sidebar-card tips-card">
+            <div class="sidebar-label"><i class="ti ti-bulb" aria-hidden="true"></i> Quick tips</div>
+            <ul class="tips-list">
+              <li>Use the STAR method (Situation, Task, Action, Result)</li>
+              <li>Give specific examples — avoid vague generalities</li>
+              <li>Show your genuine motivation for studying in the UK</li>
+              <li>Keep answers 90–120 seconds long</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- RESULTS SCREEN -->
+    <section id="screen-results" class="screen">
+      <div class="results-header">
+        <div class="results-badge" id="results-badge"></div>
+        <h2 class="results-title">Interview complete</h2>
+        <p class="results-sub">Here's your full performance report. Use this to focus your preparation.</p>
+      </div>
+
+      <div class="results-metrics" id="results-metrics"></div>
+
+      <div class="results-section-title">Question-by-question breakdown</div>
+      <div id="q-breakdown"></div>
+
+      <div class="results-actions">
+        <button class="btn-primary btn-lg" onclick="restartInterview()">
+          <i class="ti ti-refresh" aria-hidden="true"></i>
+          Practice again
+        </button>
+        <button class="btn-secondary btn-lg" onclick="goHome()">
+          <i class="ti ti-home" aria-hidden="true"></i>
+          Change interview type
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- END CONFIRMATION MODAL -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none;" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3>End this session?</h3>
+      <p>You'll still see results for questions you've already answered.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal()">Keep going</button>
+        <button class="btn-danger" onclick="endInterview()">End session</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Built for students with love · Free forever · No data stored</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
