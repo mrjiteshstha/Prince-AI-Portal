@@ -911,3 +911,116 @@ body {
 .timer-row.danger .timer-display {
   animation: timerPulse 1s ease-in-out infinite;
 }
+
+/* ---- CAMERA PANEL ---- */
+.camera-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0a0a0a;
+  border-radius: 14px;
+  padding: 10px 14px 10px 10px;
+  margin-bottom: 16px;
+  border: 1.5px solid #222;
+}
+.camera-inner {
+  position: relative;
+  width: 180px;
+  min-width: 180px;
+  height: 112px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #111;
+  flex-shrink: 0;
+}
+.camera-inner video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror effect */
+  display: block;
+}
+.camera-overlay {
+  position: absolute;
+  top: 7px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 2;
+}
+.camera-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  display: none;
+  animation: recBlink 1.2s ease-in-out infinite;
+}
+@keyframes recBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+#camera-rec-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ef4444;
+  letter-spacing: 0.08em;
+  display: none;
+}
+.camera-off-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #555;
+  font-size: 12px;
+}
+.camera-off-msg i {
+  font-size: 22px;
+  color: #444;
+}
+.camera-toggle-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  color: #bbb;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.camera-toggle-btn i {
+  font-size: 20px;
+}
+.camera-toggle-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(37,99,235,0.07);
+}
+@media (max-width: 600px) {
+  .camera-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+  .camera-inner {
+    width: 100%;
+    min-width: unset;
+    height: 160px;
+  }
+  .camera-toggle-btn {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+  }
+}
