@@ -18,7 +18,7 @@
         <i class="ti ti-certificate" aria-hidden="true"></i>
         <span>Prince AI Portal</span>
       </div>
-      <div class="nav-tag">For students</div>
+      <div class="nav-tag">For Students</div>
     </div>
   </nav>
 
@@ -29,7 +29,7 @@
       <div class="hero">
         <div class="hero-badge">
           <i class="ti ti-sparkles" aria-hidden="true"></i>
-          Powered by JITESH SHRESTHA · 100% Free
+          Powered by Jitesh Shrestha · 100% Free
         </div>
         <h1 class="hero-title">Ace your UK study abroad interview</h1>
         <p class="hero-sub">Practice real university, visa, and scholarship interviews with an AI coach that scores your answers and gives you actionable feedback — no signup, no cost.</p>
@@ -41,7 +41,7 @@
           <div class="type-icon"><i class="ti ti-school" aria-hidden="true"></i></div>
           <div class="type-body">
             <h3>University admission</h3>
-            <p>Oxford, UEL, UCB, BNU and more — motivations, subject knowledge, personal statement deep dives</p>
+            <p>Oxford, UCL, Edinburgh and more — motivations, subject knowledge, personal statement deep dives</p>
           </div>
           <div class="type-check"><i class="ti ti-circle-check-filled" aria-hidden="true"></i></div>
         </button>
@@ -56,7 +56,7 @@
         <button class="type-card" data-type="scholarship" onclick="selectType(this)">
           <div class="type-icon"><i class="ti ti-award" aria-hidden="true"></i></div>
           <div class="type-body">
-            <h3>Interview</h3>
+            <h3>Scholarship interview</h3>
             <p>Chevening, Commonwealth, Gates Cambridge — leadership potential, community impact, career vision</p>
           </div>
           <div class="type-check"><i class="ti ti-circle-check-filled" aria-hidden="true"></i></div>
@@ -68,7 +68,7 @@
           <i class="ti ti-player-play" aria-hidden="true"></i>
           Start interview
         </button>
-        <p class="home-note">12 questions · Instant AI feedback ·</p>
+        <p class="home-note">12 questions · Instant AI feedback · No account needed</p>
       </div>
 
       <div class="how-it-works">
@@ -112,7 +112,7 @@
         <div class="coach-row">
           <div class="coach-avatar"><i class="ti ti-robot" aria-hidden="true"></i></div>
           <div>
-            <div class="coach-name">Er. Jitesh Shrestha</div>
+            <div class="coach-name">Er. Prince Shrestha</div>
             <div class="coach-role">AI Interview Coach · <span id="interview-type-label"></span></div>
           </div>
         </div>
@@ -124,6 +124,25 @@
       <div class="interview-layout">
         <!-- LEFT: Main panel -->
         <div class="interview-main">
+          <!-- Camera feed -->
+          <div class="camera-panel" id="camera-panel">
+            <div class="camera-inner">
+              <video id="camera-video" autoplay muted playsinline></video>
+              <div class="camera-overlay">
+                <div class="camera-rec-dot" id="camera-rec-dot"></div>
+                <span id="camera-rec-label">LIVE</span>
+              </div>
+              <div class="camera-off-msg" id="camera-off-msg">
+                <i class="ti ti-video-off"></i>
+                <span>Camera off</span>
+              </div>
+            </div>
+            <button class="camera-toggle-btn" id="camera-toggle-btn" onclick="toggleCamera()">
+              <i class="ti ti-video" id="camera-toggle-icon"></i>
+              <span id="camera-toggle-label">Enable camera</span>
+            </button>
+          </div>
+
           <!-- Question area -->
           <div id="question-area">
             <div class="loading-state">
@@ -240,7 +259,7 @@
   </div>
 
   <footer class="footer">
-    <p>Built for students with Love · Free forever · Thank You</p>
+    <p>Built for students with love · Free forever · Thank You</p>
   </footer>
 
   <script src="app.js"></script>
