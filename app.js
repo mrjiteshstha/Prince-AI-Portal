@@ -217,6 +217,7 @@ function startInterview() {
   document.getElementById('interview-type-label').textContent = TYPE_LABELS[selectedType];
   showScreen('screen-interview');
   loadQuestion();
+  startCamera();
 }
 
 // ---- SCREEN MANAGEMENT ----
@@ -386,11 +387,11 @@ Student's answer: "${answer}"
 
 Evaluate this answer thoroughly and fairly. Return ONLY a valid JSON object with no markdown, no backticks, and no extra text:
 {
-  "score": <integer from 1 to 10>,
+  "score": <a decimal number strictly between 4.5 and 7.0 — never below 4.5, never above 7.0. Use one decimal place e.g. 5.0, 5.5, 6.0, 6.5, 7.0. Weak answers: 4.5-5.4, average answers: 5.5-6.4, strong answers: 6.5-7.0>,
   "overall": "<2-3 sentence overall assessment in a warm, encouraging coaching tone>",
   "strengths": "<2-3 specific things the student did well — be concrete, not generic>",
   "improvements": "<2-3 specific, actionable areas to improve — give examples of what to add or change>",
-  "ideal_approach": "<concisely describe what a 9 or 10 out of 10 answer would include — structure, key points, tone>"
+  "ideal_approach": "<concisely describe what a strong 7 out of 10 answer would include — structure, key points, tone>"
 }`;
 
   try {
@@ -422,7 +423,12 @@ Evaluate this answer thoroughly and fairly. Return ONLY a valid JSON object with
       .replace(/```json|```/g, '')
       .trim();
 
-    return JSON.parse(text);
+    const parsed = JSON.parse(text);
+    // Clamp score to 4.5–7.0 range
+    if (typeof parsed.score === 'number') {
+      parsed.score = Math.min(7.0, Math.max(4.5, parseFloat(parsed.score.toFixed(1))));
+    }
+    return parsed;
   } catch (err) {
     console.error('Feedback error:', err);
     return getMockFeedback(answer);
@@ -431,7 +437,7 @@ Evaluate this answer thoroughly and fairly. Return ONLY a valid JSON object with
 
 function getMockFeedback(answer) {
   const wordCount = answer.split(/\s+/).filter(Boolean).length;
-  const score = Math.min(8, Math.max(4, Math.round(wordCount / 12)));
+  const score = Math.min(7, Math.max(4.5, parseFloat((4.5 + Math.min(2.5, wordCount / 20)).toFixed(1))));
   return {
     score,
     overall: `Your answer shows genuine effort and covers some key points. To make it stronger, focus on using the STAR method (Situation, Task, Action, Result) and providing specific examples. Add your Anthropic API key to app.js to enable full AI-powered coaching.`,
@@ -444,9 +450,9 @@ function getMockFeedback(answer) {
 // ---- RENDER FEEDBACK ----
 function renderFeedback(fb, container) {
   const score = fb ? fb.score : 0;
-  const scoreColor = score >= 8 ? 'var(--green-600)' : score >= 5 ? 'var(--amber-600)' : 'var(--red-600)';
-  const labelClass = score >= 8 ? 'high' : score >= 5 ? 'mid' : 'low';
-  const labelText = score >= 8 ? 'Excellent' : score >= 6 ? 'Good' : score >= 4 ? 'Developing' : 'Needs work';
+  const scoreColor = score >= 6.5 ? 'var(--green-600)' : score >= 5 ? 'var(--amber-600)' : 'var(--red-500)';
+  const labelClass = score >= 6.5 ? 'high' : score >= 5 ? 'mid' : 'low';
+  const labelText = score >= 6.5 ? 'Strong' : score >= 5.5 ? 'Good' : 'Developing';
   const isLast = currentQ >= questions.length - 1;
 
   container.innerHTML = `
@@ -499,7 +505,7 @@ function updateHistory() {
     let pillClass = 'none', scoreText = '—';
     if (score !== null) {
       scoreText = score + '/10';
-      pillClass = score >= 8 ? 'high' : score >= 5 ? 'mid' : 'low';
+      pillClass = score >= 6.5 ? 'high' : score >= 5 ? 'mid' : 'low';
     }
     const shortQ = questions[i].substring(0, 30) + '…';
     html += `<div class="history-item">
@@ -558,17 +564,17 @@ function showResults() {
     : 0;
   const best = validScores.length ? Math.max(...validScores) : 0;
   const answered = answers.filter(a => !a.includes('skipped')).length;
-  const readyText = avg >= 7 ? 'Yes ✓' : avg >= 5 ? 'Almost' : 'Keep going';
-  const readyDesc = avg >= 7 ? 'Strong performance' : avg >= 5 ? 'Good progress' : 'More practice needed';
+  const readyText = avg >= 6.5 ? 'Yes ✓' : avg >= 5 ? 'Almost' : 'Keep going';
+  const readyDesc = avg >= 6.5 ? 'Strong performance' : avg >= 5 ? 'Good progress' : 'More practice needed';
 
-  const avgColor = avg >= 8 ? 'var(--green-600)' : avg >= 5 ? 'var(--amber-600)' : 'var(--red-600)';
-  const bestColor = best >= 8 ? 'var(--green-600)' : best >= 5 ? 'var(--amber-600)' : 'var(--red-600)';
+  const avgColor = avg >= 6.5 ? 'var(--green-600)' : avg >= 5 ? 'var(--amber-600)' : 'var(--red-500)';
+  const bestColor = best >= 6.5 ? 'var(--green-600)' : best >= 5 ? 'var(--amber-600)' : 'var(--red-500)';
 
   const badgeEl = document.getElementById('results-badge');
-  if (avg >= 7) {
+  if (avg >= 6.5) {
     badgeEl.style.cssText = 'background:var(--green-50);color:var(--green-600);';
     badgeEl.textContent = '🎉 Great session!';
-  } else if (avg >= 5) {
+  } else if (avg >= 5.5) {
     badgeEl.style.cssText = 'background:var(--amber-50);color:var(--amber-600);';
     badgeEl.textContent = '💪 Good effort!';
   } else {
@@ -604,7 +610,7 @@ function showResults() {
     const fb = feedbacks[i];
     const score = fb ? fb.score : null;
     const color = score !== null
-      ? (score >= 8 ? 'var(--green-600)' : score >= 5 ? 'var(--amber-600)' : 'var(--red-600)')
+      ? (score >= 6.5 ? 'var(--green-600)' : score >= 5 ? 'var(--amber-600)' : 'var(--red-500)')
       : 'var(--text-mute)';
     const tip = fb ? fb.improvements.split('.')[0] + '.' : 'No feedback available.';
 
@@ -643,11 +649,13 @@ function startInterviewWithSameType() {
   document.getElementById('interview-type-label').textContent = TYPE_LABELS[selectedType];
   showScreen('screen-interview');
   loadQuestion();
+  startCamera();
   updateHistory();
 }
 
 function goHome() {
   stopRecording();
+  stopCamera();
   selectedType = null;
   currentQ = 0;
   answers = [];
@@ -738,6 +746,56 @@ function autoSubmitOnTimeout() {
     const labelEl = document.getElementById('timer-label');
     if (labelEl) labelEl.textContent = "Time's up!";
     setTimeout(() => skipQuestion(), 1200);
+  }
+}
+
+
+// ---- CAMERA ----
+let cameraStream = null;
+let cameraEnabled = false;
+
+async function startCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    const video = document.getElementById('camera-video');
+    video.srcObject = cameraStream;
+    cameraEnabled = true;
+    document.getElementById('camera-off-msg').style.display = 'none';
+    document.getElementById('camera-rec-dot').style.display = 'block';
+    document.getElementById('camera-rec-label').style.display = 'block';
+    document.getElementById('camera-toggle-icon').className = 'ti ti-video-off';
+    document.getElementById('camera-toggle-label').textContent = 'Disable camera';
+  } catch (err) {
+    console.warn('Camera access denied or unavailable:', err);
+    document.getElementById('camera-off-msg').innerHTML = '<i class="ti ti-video-off"></i><span>Camera unavailable</span>';
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  const video = document.getElementById('camera-video');
+  if (video) video.srcObject = null;
+  cameraEnabled = false;
+  const offMsg = document.getElementById('camera-off-msg');
+  if (offMsg) { offMsg.style.display = 'flex'; offMsg.innerHTML = '<i class="ti ti-video-off"></i><span>Camera off</span>'; }
+  const dot = document.getElementById('camera-rec-dot');
+  if (dot) dot.style.display = 'none';
+  const lbl = document.getElementById('camera-rec-label');
+  if (lbl) lbl.style.display = 'none';
+  const icon = document.getElementById('camera-toggle-icon');
+  if (icon) icon.className = 'ti ti-video';
+  const toggleLbl = document.getElementById('camera-toggle-label');
+  if (toggleLbl) toggleLbl.textContent = 'Enable camera';
+}
+
+function toggleCamera() {
+  if (cameraEnabled) {
+    stopCamera();
+  } else {
+    startCamera();
   }
 }
 
