@@ -185,6 +185,9 @@ let feedbacks = [];
 let isRecording = false;
 let recognition = null;
 let recordingTranscriptBase = '';
+let timerInterval = null;
+let timerSeconds = 120;
+const TIMER_DURATION = 120;
 
 // ---- ANTHROPIC API KEY ----
 // Replace with your actual key from https://console.anthropic.com
@@ -251,6 +254,7 @@ function loadQuestion() {
     document.getElementById('answer-area').style.display = 'block';
     document.getElementById('submit-btn').disabled = false;
     stopRecording();
+    startTimer();
   }, 600);
 }
 
@@ -334,6 +338,7 @@ function stopRecording() {
 
 // ---- SUBMIT ANSWER ----
 function skipQuestion() {
+  stopTimer();
   if (isRecording) stopRecording();
   answers.push('[No answer given — skipped]');
   feedbacks.push(null);
@@ -342,6 +347,7 @@ function skipQuestion() {
 }
 
 async function submitAnswer() {
+  stopTimer();
   if (isRecording) stopRecording();
   const answer = document.getElementById('answer-text').value.trim();
   if (!answer) {
@@ -513,6 +519,7 @@ function moveToNext() {
 }
 
 function retryQuestion() {
+  stopTimer();
   answers.pop();
   feedbacks[currentQ] = undefined;
   loadQuestion();
@@ -647,6 +654,76 @@ function goHome() {
   document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('start-btn').disabled = true;
   showScreen('screen-home');
+}
+
+
+// ---- TIMER ----
+const CIRCUMFERENCE = 100; // matches stroke-dasharray in SVG
+
+function startTimer() {
+  stopTimer(); // clear any existing
+  timerSeconds = TIMER_DURATION;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    updateTimerDisplay();
+    if (timerSeconds <= 0) {
+      stopTimer();
+      autoSubmitOnTimeout();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function updateTimerDisplay() {
+  const textEl = document.getElementById('timer-text');
+  const ringEl = document.getElementById('timer-ring-fill');
+  const rowEl  = document.querySelector('.timer-row');
+  const labelEl = document.getElementById('timer-label');
+  if (!textEl || !ringEl || !rowEl) return;
+
+  const mins = Math.floor(timerSeconds / 60);
+  const secs = timerSeconds % 60;
+  textEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+  // Shrink the ring as time runs out
+  const progress = timerSeconds / TIMER_DURATION;
+  const offset = CIRCUMFERENCE - (progress * CIRCUMFERENCE);
+  ringEl.style.strokeDashoffset = offset;
+
+  // Colour states
+  rowEl.classList.remove('warning', 'danger');
+  if (timerSeconds <= 30) {
+    rowEl.classList.add('danger');
+    labelEl.textContent = 'Hurry up!';
+  } else if (timerSeconds <= 60) {
+    rowEl.classList.add('warning');
+    labelEl.textContent = 'Time running out';
+  } else {
+    labelEl.textContent = 'Time remaining';
+  }
+}
+
+function autoSubmitOnTimeout() {
+  const answer = document.getElementById('answer-text').value.trim();
+  if (answer) {
+    // Auto-submit if they have typed/spoken something
+    submitAnswer();
+  } else {
+    // Skip if nothing entered
+    const rowEl = document.querySelector('.timer-row');
+    if (rowEl) rowEl.classList.add('danger');
+    const labelEl = document.getElementById('timer-label');
+    if (labelEl) labelEl.textContent = "Time's up!";
+    setTimeout(() => skipQuestion(), 1200);
+  }
 }
 
 // ---- KEYBOARD SHORTCUTS ----
