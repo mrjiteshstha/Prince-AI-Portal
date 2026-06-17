@@ -236,7 +236,7 @@ async function getFeedback(question, answer, qIdx) {
   }
 
   const typeLabel = TYPE_LABELS[selectedType];
-  const prompt = `You are Dr. Emma Clarke, an expert UK study abroad interview coach with 15 years of experience helping international students prepare for university admission, visa, and scholarship interviews.
+  const prompt = `You are Er. Prince Shrestha, an expert UK study abroad interview coach with 15 years of experience helping international students prepare for university admission, visa, and scholarship interviews.
 
 Interview type: ${typeLabel}
 Question asked: "${question}"
