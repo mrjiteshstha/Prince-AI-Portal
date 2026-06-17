@@ -254,7 +254,7 @@ function loadQuestion() {
     document.getElementById('answer-area').style.display = 'block';
     document.getElementById('submit-btn').disabled = false;
     stopRecording();
-    startTimer();
+    resetTimerDisplay();
   }, 600);
 }
 
@@ -268,6 +268,7 @@ function updateProgress() {
 function toggleRecording() {
   if (isRecording) {
     stopRecording();
+    stopTimer();
   } else {
     startRecording();
   }
@@ -313,6 +314,7 @@ function startRecording() {
 
   recognition.start();
   isRecording = true;
+  startTimer();
 
   const btn = document.getElementById('mic-btn');
   btn.classList.add('recording');
@@ -659,6 +661,19 @@ function goHome() {
 
 // ---- TIMER ----
 const CIRCUMFERENCE = 100; // matches stroke-dasharray in SVG
+
+function resetTimerDisplay() {
+  const textEl = document.getElementById('timer-text');
+  const ringEl = document.getElementById('timer-ring-fill');
+  const rowEl  = document.querySelector('.timer-row');
+  const labelEl = document.getElementById('timer-label');
+  if (!textEl || !ringEl || !rowEl) return;
+
+  textEl.textContent = '2:00';
+  ringEl.style.strokeDashoffset = 0;
+  rowEl.classList.remove('warning', 'danger');
+  if (labelEl) labelEl.textContent = 'Tap to speak to start';
+}
 
 function startTimer() {
   stopTimer(); // clear any existing
